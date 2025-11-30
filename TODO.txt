@@ -1,0 +1,31 @@
+# Funtions!
+
+done:
+
+tansiprint
+tansiprintln
+
+todo:
+
+tansi rgb
+
+tansi enable output color;
+tansi disable output color;
+
+tansi_bg color;
+tansi enable background color;
+tansi disable background color;
+
+tansi_underlines!;
+
+
+tansi_lgbtq ////not funny .. multicolor text!
+
+tansi LOGS!; errors warnings etc
+tansi_assert!;
+
+
+
+tansi enable for windows!
+
+
