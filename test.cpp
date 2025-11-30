@@ -7,7 +7,7 @@ int main()
 {
 
   tansi_println("Hello", TANSI_RED);
-  tansi_println("Assert test under !!" , TANSI_YELLOW);
-  tansi_println("Did Assert Work???" , TANSI_CYAN);
+  tansi_println("This is Tiny Ansi !!" , TANSI_YELLOW);
+  tansi_println("Tiny LIke u" , TANSI_CYAN);
   return 0;
 }
