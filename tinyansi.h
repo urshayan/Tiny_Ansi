@@ -57,6 +57,7 @@ void tansi_print(const char* msg , tansi_color color);
 void tansi_println(const char* msg , tansi_color color);
 void tansi_printf(tansi_color color , const char* fmt , ...);
 void tansi_log(tansi_level level , const char* fmt, ...);
+void tansi_init(void);
 #ifdef __cplusplus
 }
 #endif
@@ -67,6 +68,10 @@ void tansi_log(tansi_level level , const char* fmt, ...);
 // ==========================
 // IMPLEMENTATION SECTION
 // ==========================
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 
 #ifdef TINY_ANSI_IMPLEMENTATION
 
@@ -155,6 +160,24 @@ void tansi_log(tansi_level level , const char* fmt , ...)
 
 }
 
+void tansi_init(void)
+{
+  #ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    if (hOut == INVALID_HANDLE_VALUE) return;
+
+    DWORD dwmode = 0;
+
+    if (!GetConsoleMode(hOut , &dwmode)) return;
+    dwmode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    //SetConsoleMode(hOut , dwmode);
+    if (!SetConsoleMode(hOut, dwmode)){
+      printf("Warning: ANSI colors are not supported! \n");
+    }
+
+  #endif
+}
 
 
 

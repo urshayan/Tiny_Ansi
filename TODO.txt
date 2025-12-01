@@ -4,6 +4,10 @@ done:
 
 tansiprint
 tansiprintln
+tansi Logs!
+tansi printf
+tansi enable Windows!
+
 
 todo:
 
@@ -21,11 +25,8 @@ tansi_underlines!;
 
 tansi_lgbtq ////not funny .. multicolor text!
 
-tansi LOGS!; errors warnings etc
 tansi_assert!;
 
 
-
-tansi enable for windows!
 
 

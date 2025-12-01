@@ -4,7 +4,7 @@
 
 int main()
 {
-
+    tansi_init();
   //tansi_println("Hello", TANSI_RED);
   //tansi_println("This is Tiny Ansi !!" , TANSI_YELLOW);
 
@@ -13,7 +13,7 @@ int main()
   //const char* name = "Shayan!";
 //  tansi_printf(TANSI_RED, "My name is %s" , name);
   
-
+    
     tansi_log(TANSI_INFO , "App Started!");
 
   return 0;
