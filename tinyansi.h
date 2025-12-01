@@ -41,10 +41,22 @@ static const char* tansi_map[TANSI_COLOR_COUNT] = {
     "\033[37m"   // WHITE
 };
 
+
+typedef enum {
+
+    TANSI_INFO,
+    TANSI_WARN,
+    TANSI_ERROR,
+    TANSI_DEBUG
+
+} tansi_level;
+
+
 //// funtionsssssssssssssssssssssssssssss
 void tansi_print(const char* msg , tansi_color color);
 void tansi_println(const char* msg , tansi_color color);
-
+void tansi_printf(tansi_color color , const char* fmt , ...);
+void tansi_log(tansi_level level , const char* fmt, ...);
 #ifdef __cplusplus
 }
 #endif
@@ -60,6 +72,8 @@ void tansi_println(const char* msg , tansi_color color);
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdarg.h>
+#include <time.h>
 // Define your functions here
 // Example:
 // void tiny_ansi_print(const char* msg, int color) { }
@@ -85,7 +99,61 @@ void tansi_println(const char* msg , tansi_color color)
 
 }
 
+void tansi_printf(tansi_color color, const char* fmt,...)
+{
+    
 
+    if (color < 0 || color >= TANSI_COLOR_COUNT)
+      color = TANSI_RESET;
+
+  va_list args;
+  
+  va_start(args,fmt);
+
+  printf("%s" , tansi_map[color]);
+  vprintf(fmt, args);
+  printf("%s", tansi_map[TANSI_RESET]);
+
+  va_end(args);
+
+}
+
+void tansi_log(tansi_level level , const char* fmt , ...)
+{
+    
+    char timebuf[9];
+////// time stamppppp!
+    time_t now = time(NULL);
+    struct tm* t = localtime(&now);
+    strftime(timebuf , sizeof(timebuf) , "%H:%M:%S" , t);
+    switch (level){
+      case 0:
+        tansi_printf(TANSI_GREEN , "[%s] [%s] " , timebuf, "INFO");
+        break;
+      case 1:
+         tansi_printf(TANSI_RED , "[%s] [%s] " , timebuf, "WARN");
+         break;
+      case 2:
+          tansi_printf(TANSI_MAGENTA , "[%s] [%s] " , timebuf, "ERROR");
+          break;
+      case 3:
+           tansi_printf(TANSI_CYAN , "[%s] [%s] " , timebuf, "DEBUG");
+           break;
+      default:
+           printf("Log Failed! \n");
+    }
+    
+    // now we print the message body
+
+    va_list args;
+
+    va_start(args , fmt);
+    vprintf(fmt,args);
+    va_end(args);
+
+    printf("\n");
+
+}
 
 
 
