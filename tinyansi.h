@@ -9,13 +9,7 @@ extern "C" {
 // PUBLIC API DECLARATIONS
 // ==========================
 
-// Declare your functions here
-// Example:
-// void tiny_ansi_print(const char* msg, int color);
-// int  tiny_ansi_version(void);
-
-
-  // mapping enums to the array!
+  // mapping Foreground Colors 
 typedef enum {
 
     TANSI_RESET,
@@ -31,7 +25,7 @@ typedef enum {
 }tansi_color;
 
 static const char* tansi_map[TANSI_COLOR_COUNT] = {
-    "\033[0m",   // RESET
+    "\033[39m",   // RESET
     "\033[31m",  // RED
     "\033[32m",  // GREEN
     "\033[33m",  // YELLOW
@@ -41,7 +35,7 @@ static const char* tansi_map[TANSI_COLOR_COUNT] = {
     "\033[37m"   // WHITE
 };
 
-
+//////// -------------------------------------
 typedef enum {
 
     TANSI_INFO,
@@ -52,12 +46,50 @@ typedef enum {
 } tansi_level;
 
 
+/////// -------------------------------------------- 
+
+// mapping background colors
+
+typedef enum {
+    TANSI_BG_DEFAULT,
+    TANSI_BG_RED,
+    TANSI_BG_GREEN,
+    TANSI_BG_YELLOW,
+    TANSI_BG_BLUE,
+    TANSI_BG_MAGENTA,
+    TANSI_BG_CYAN,
+    TANSI_BG_WHITE,
+    TANSI_BG_COUNT
+} tansi_bg;
+
+static const char* tansi_bg_map[TANSI_BG_COUNT] = {
+    "\033[49m", // default
+    "\033[41m", // red
+    "\033[42m", // green
+    "\033[43m", // yellow
+    "\033[44m", // blue
+    "\033[45m", // magenta
+    "\033[46m", // cyan
+    "\033[47m"  // white
+};
+
+//// --------------------------------------------------------  
+
+
+
+
+
+
 //// funtionsssssssssssssssssssssssssssss
 void tansi_print(const char* msg , tansi_color color);
 void tansi_println(const char* msg , tansi_color color);
 void tansi_printf(tansi_color color , const char* fmt , ...);
 void tansi_log(tansi_level level , const char* fmt, ...);
 void tansi_init(void);
+void tansi_enablecolor(tansi_color color);
+void tansi_disablecolor();
+void tansi_enable_bgcolor(tansi_bg bg);
+void tansi_disable_bgcolor();
 #ifdef __cplusplus
 }
 #endif
@@ -79,9 +111,7 @@ void tansi_init(void);
 #include <assert.h>
 #include <stdarg.h>
 #include <time.h>
-// Define your functions here
-// Example:
-// void tiny_ansi_print(const char* msg, int color) { }
+
 
 void tansi_print(const char* msg, tansi_color color)
 {
@@ -179,7 +209,28 @@ void tansi_init(void)
   #endif
 }
 
+void tansi_enablecolor(tansi_color color)
+{
+    if (color < 0 || color >= TANSI_COLOR_COUNT) return;
+    printf(tansi_map[color]);
+}
 
+void tansi_disablecolor()
+{
+    printf(tansi_map[TANSI_RESET]);
+}
+
+void tansi_enable_bgcolor(tansi_bg bg)
+{
+    if (bg < 0 || bg >= TANSI_BG_COUNT) return;
+    printf(tansi_bg_map[bg]);
+
+}
+
+void tansi_disable_bgcolor()
+{
+  printf(tansi_bg_map[TANSI_BG_DEFAULT]);
+}
 
 #endif // TINY_ANSI_IMPLEMENTATION
 

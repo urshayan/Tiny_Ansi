@@ -7,25 +7,20 @@ tansiprintln
 tansi Logs!
 tansi printf
 tansi enable Windows!
-
+tanis enable/disbale color!
+tansi enable.disable backfround!
 
 todo:
 
-tansi rgb
-
-tansi enable output color;
-tansi disable output color;
-
-tansi_bg color;
-tansi enable background color;
-tansi disable background color;
-
-tansi_underlines!;
+tansi underlines!;
 
 
-tansi_lgbtq ////not funny .. multicolor text!
+Tansi Assert system!
+Tansi Fatal Mode (Exit)!
+Tansi Progress Bar 
 
-tansi_assert!;
+
+tansi style -- with text color bgcolor and as well as underline!
 
 
 
