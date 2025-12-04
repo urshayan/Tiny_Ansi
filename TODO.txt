@@ -12,13 +12,14 @@ tansi enable.disable backfround!
 
 todo:
 
-tansi underlines!;
-
+tansi enable style--- disbale styule....tansi printf style ...bla bla bla!;
+tansi style printf/print 
 
 Tansi Assert system!
-Tansi Fatal Mode (Exit)!
-Tansi Progress Bar 
 
+Tansi Fatal Mode (Exit)!
+
+Tansi Progress Bar 
 
 tansi style -- with text color bgcolor and as well as underline!
 

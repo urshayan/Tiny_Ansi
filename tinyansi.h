@@ -75,10 +75,29 @@ static const char* tansi_bg_map[TANSI_BG_COUNT] = {
 
 //// --------------------------------------------------------  
 
+/// Mapping Effectssss
 
+typedef enum {
+    TANSI_EFFECT_RESET = 0,
+    TANSI_EFFECT_BOLD,
+    TANSI_EFFECT_DIM,
+    TANSI_EFFECT_UNDERLINE,
+    TANSI_EFFECT_BLINK,
+    TANSI_EFFECT_REVERSE,
+    TANSI_EFFECT_COUNT
+}tansi_effects;
 
+static const char* tansi_effect_map[TANSI_EFFECT_COUNT] = {
 
+    "\033[0m",  // reset
+    "\033[1m",  // bold
+    "\033[2m",  // dim
+    "\033[4m",  // underline
+    "\033[5m",  // blink (not supported everywhere)
+    "\033[7m"   // reverse
+};
 
+/////-------------------------------------------------------------------  
 
 //// funtionsssssssssssssssssssssssssssss
 void tansi_print(const char* msg , tansi_color color);
@@ -90,6 +109,13 @@ void tansi_enablecolor(tansi_color color);
 void tansi_disablecolor();
 void tansi_enable_bgcolor(tansi_bg bg);
 void tansi_disable_bgcolor();
+void tansi_eprint(const char* msg ,  tansi_effects effect);   // effect print 
+void tansi_eprintln(const char* msg , tansi_effects effect);
+void tansi_eprintf(tansi_effects effect , const char* fmt , ...);
+void tansi_styleprint(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect);
+void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect);
+//void tansi_styleprintf(tansi_color color , tansi_bg bg ,tansi_effects effect , const char* fmt, ...);
+
 #ifdef __cplusplus
 }
 #endif
@@ -231,6 +257,68 @@ void tansi_disable_bgcolor()
 {
   printf(tansi_bg_map[TANSI_BG_DEFAULT]);
 }
+
+void tansi_eprint(const char* msg , tansi_effects effect)
+{
+  assert(msg != NULL);
+   if (effect < 0 || effect >= TANSI_EFFECT_COUNT) effect = TANSI_EFFECT_RESET;
+
+   printf("%s%s%s" , tansi_effect_map[effect] , msg , tansi_effect_map[TANSI_EFFECT_RESET]);
+
+}
+
+void tansi_eprintln(const char* msg , tansi_effects effect)
+{
+  assert(msg != NULL);
+    if (effect < 0 || effect >= TANSI_EFFECT_COUNT) effect = TANSI_EFFECT_RESET;
+
+    printf("%s%s%s" , tansi_effect_map[effect] , msg , tansi_effect_map[TANSI_EFFECT_RESET]);
+    printf("/n");
+}
+
+void tansi_eprintf(tansi_effects effect, const char* fmt,...)
+{
+    
+
+    if (effect < 0 || effect >= TANSI_EFFECT_COUNT)
+      effect = TANSI_EFFECT_RESET;
+
+  va_list args;
+  
+  va_start(args,fmt);
+
+  printf("%s" , tansi_effect_map[effect]);
+  vprintf(fmt, args);
+  printf("%s", tansi_effect_map[TANSI_RESET]);
+
+  va_end(args);
+
+}
+
+void tansi_styleprint(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect)
+{
+      assert(msg != NULL);
+      
+          if (color < 0 || color >= TANSI_COLOR_COUNT)
+              color = TANSI_RESET;
+          if (bg < 0 || bg >= TANSI_BG_COUNT)
+              bg = TANSI_BG_DEFAULT;
+          if (effect < 0 || effect >= TANSI_EFFECT_COUNT)
+              effect = TANSI_EFFECT_RESET;
+
+          printf("%s%s%s%s",tansi_effect_map[effect], tansi_map[color] ,  tansi_bg_map[bg] , msg );
+
+          printf("%s" , tansi_effect_map[TANSI_EFFECT_RESET]);
+
+}
+
+void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect)
+{
+      tansi_styleprint(msg,color,bg,effect);
+      printf("\n");
+}
+
+
 
 #endif // TINY_ANSI_IMPLEMENTATION
 
