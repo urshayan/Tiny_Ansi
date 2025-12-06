@@ -127,6 +127,7 @@ tansi_disable_bgcolor();
 ## Example Program
 
 ```c
+#define TINY_ANSI_IMPLEMENTATION
 #include "tinyansi.h"
 #include <unistd.h> // for usleep()
 
