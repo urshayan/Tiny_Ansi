@@ -8,11 +8,13 @@ int main()
   //tansi_println("Does this run?" , TANSI_RED);
   //tansi_print("" , TANSI_RED); //for the programme to crash
 
-      int a = 0;
+      //int a = 0;
 
-      TANSI_ASSERT(a > 10 , "A is greater than 0");
+      //TANSI_ASSERT(a > 10 , "A is greater than 0");
 
-
+  tansi_log(TANSI_INFO, "Info message: %s", "All systems go");
+  tansi_log(TANSI_WARN, "Warning: %s", "Low memory");
+  tansi_log(TANSI_ERROR, "Error: %s", "File not found");
   //tansi_println("This is Tiny Ansi !!" , TANSI_YELLOW);
 
   //tansi_println("Tiny Like u" , TANSI_CYAN);

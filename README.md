@@ -31,7 +31,7 @@ wget https://github.com/urshayan/Tiny_Ansi/blob/main/tinyansi.h
 Or clone the repository:
 
 ```bash
-git https://github.com/urshayan/Tiny_Ansi
+git clone https://github.com/urshayan/Tiny_Ansi
 ```
 
 ---
