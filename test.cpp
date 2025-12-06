@@ -4,7 +4,15 @@
 int main()
 {
     tansi_init();
-  //tansi_println("Hello", TANSI_RED);
+
+  //tansi_println("Does this run?" , TANSI_RED);
+  //tansi_print("" , TANSI_RED); //for the programme to crash
+
+      int a = 0;
+
+      TANSI_ASSERT(a > 10 , "A is greater than 0");
+
+
   //tansi_println("This is Tiny Ansi !!" , TANSI_YELLOW);
 
   //tansi_println("Tiny Like u" , TANSI_CYAN);
@@ -12,8 +20,10 @@ int main()
   //const char* name = "Shayan!";
 // tansi_logansi_printf(TANSI_RED, "My name is %s" , name);
   
+    //tansi_enable_bgcolor(TANSI_BG_BLUE);
+   // tansi_log(TANSI_INFO , "This Shit Works!!");
     
-    //tansi_log(TANSI_INFO , "App Started!");
+
   //tansi_enablecolor(TANSI_YELLOW);
   //printf("Does this all makes sense? \n");
   //printf("Yes this all makes Sense!");
@@ -31,7 +41,7 @@ int main()
    /// const char* name = "Shayaaaaaan";
     //tansi_eprintf(TANSI_EFFECT_BOLD , "My name is %s" , name);
     
-      tansi_styleprint("My name is Shayan" , TANSI_RED , TANSI_BG_BLUE, TANSI_EFFECT_DIM);
+     // tansi_styleprint("My name is Shayan" , TANSI_RED , TANSI_BG_BLUE, TANSI_EFFECT_DIM);
 
 
   return 0;

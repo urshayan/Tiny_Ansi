@@ -9,19 +9,14 @@ tansi printf
 tansi enable Windows!
 tanis enable/disbale color!
 tansi enable.disable backfround!
+tansi effect with printf and print ....
+tansi style print
+tansi assert system & FATAL MODE!!
 
 todo:
 
-tansi enable style--- disbale styule....tansi printf style ...bla bla bla!;
-tansi style printf/print 
-
-Tansi Assert system!
-
-Tansi Fatal Mode (Exit)!
-
 Tansi Progress Bar 
 
-tansi style -- with text color bgcolor and as well as underline!
 
 
 

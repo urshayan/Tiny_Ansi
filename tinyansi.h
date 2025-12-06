@@ -96,8 +96,12 @@ static const char* tansi_effect_map[TANSI_EFFECT_COUNT] = {
     "\033[5m",  // blink (not supported everywhere)
     "\033[7m"   // reverse
 };
-
 /////-------------------------------------------------------------------  
+
+#define RESET "\033[0m"
+
+
+
 
 //// funtionsssssssssssssssssssssssssssss
 void tansi_print(const char* msg , tansi_color color);
@@ -114,7 +118,17 @@ void tansi_eprintln(const char* msg , tansi_effects effect);
 void tansi_eprintf(tansi_effects effect , const char* fmt , ...);
 void tansi_styleprint(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect);
 void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect);
-//void tansi_styleprintf(tansi_color color , tansi_bg bg ,tansi_effects effect , const char* fmt, ...);
+void tansi_fatal(const char* tag, const char* msg, const char* file , int line);
+
+
+//#define TANSI_ASSERT(x, msg) \
+//    do { \
+//        if (!(x)) { tansi_fatal("ASSERT", msg, __FILE__, __LINE__); } \
+//    } while(0)
+#define TANSI_ASSERT(cond, msg) \
+    ((cond) ? (void)0 : tansi_fatal("ASSERT", msg, __FILE__, __LINE__))
+
+
 
 #ifdef __cplusplus
 }
@@ -134,14 +148,18 @@ void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi
 #ifdef TINY_ANSI_IMPLEMENTATION
 
 #include <stdio.h>
-#include <assert.h>
 #include <stdarg.h>
 #include <time.h>
+#include <cstdlib>
+
 
 
 void tansi_print(const char* msg, tansi_color color)
 {
-    assert(msg != NULL);
+    //TANSI_ASSERT(msg != NULL, "Message Cannot be EMPTY");
+
+    TANSI_ASSERT(msg && msg[0] != '\0', "Message is empty");
+    
     if (color < 0 || color >= TANSI_COLOR_COUNT)
       color = TANSI_RESET;
 
@@ -150,7 +168,8 @@ void tansi_print(const char* msg, tansi_color color)
 
 void tansi_println(const char* msg , tansi_color color)
 {
-    assert(msg != NULL);
+    //TANSI_ASSERT(msg != NULL , "Message Cannot be EMPTY");
+    TANSI_ASSERT(msg && msg[0] != '\0', "Message is empty");
 
     if (color < 0 || color >= TANSI_COLOR_COUNT)
       color = TANSI_RESET;
@@ -260,7 +279,8 @@ void tansi_disable_bgcolor()
 
 void tansi_eprint(const char* msg , tansi_effects effect)
 {
-  assert(msg != NULL);
+ // TANSI_ASSERT(msg != NULL , "Message Cannot be EMPTY");
+  TANSI_ASSERT(msg && msg[0] != '\0', "Message is empty");
    if (effect < 0 || effect >= TANSI_EFFECT_COUNT) effect = TANSI_EFFECT_RESET;
 
    printf("%s%s%s" , tansi_effect_map[effect] , msg , tansi_effect_map[TANSI_EFFECT_RESET]);
@@ -269,7 +289,8 @@ void tansi_eprint(const char* msg , tansi_effects effect)
 
 void tansi_eprintln(const char* msg , tansi_effects effect)
 {
-  assert(msg != NULL);
+  //TANSI_ASSERT(msg != NULL , "Message cannot be EMPTY");
+  TANSI_ASSERT(msg && msg[0] != '\0', "Message is empty");
     if (effect < 0 || effect >= TANSI_EFFECT_COUNT) effect = TANSI_EFFECT_RESET;
 
     printf("%s%s%s" , tansi_effect_map[effect] , msg , tansi_effect_map[TANSI_EFFECT_RESET]);
@@ -297,7 +318,9 @@ void tansi_eprintf(tansi_effects effect, const char* fmt,...)
 
 void tansi_styleprint(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect)
 {
-      assert(msg != NULL);
+      //TANSI_ASSERT(msg != NULL , "Message Cannot Be EMPTY");
+      TANSI_ASSERT(msg && msg[0] != '\0', "Message is empty");
+
       
           if (color < 0 || color >= TANSI_COLOR_COUNT)
               color = TANSI_RESET;
@@ -318,6 +341,17 @@ void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi
       printf("\n");
 }
 
+void tansi_fatal(const char* tag, const char* msg, const char* file , int line)
+{
+      fprintf(stderr,"%s%s[FATAL %s] %s" , tansi_effect_map[TANSI_EFFECT_BOLD] , tansi_map[TANSI_GREEN] , tag , RESET );
+      fprintf(stderr,"%s \n" , msg );
+      fprintf(stderr,"%s Location: %s %s : %d \n", tansi_map[TANSI_BLUE] , RESET , file , line);
+
+      fflush(stderr);
+
+      exit(EXIT_FAILURE);
+
+}
 
 
 #endif // TINY_ANSI_IMPLEMENTATION
