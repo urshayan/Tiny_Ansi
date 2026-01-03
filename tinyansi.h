@@ -1,3 +1,15 @@
+/*                   _______  _        _______ _________
+\__   __/\__   __/( (    /||\     /|  (  ___  )( (    /|(  ____ \\__   __/
+   ) (      ) (   |  \  ( |( \   / )  | (   ) ||  \  ( || (    \/   ) (   
+   | |      | |   |   \ | | \ (_) /   | (___) ||   \ | || (_____    | |   
+   | |      | |   | (\ \) |  \   /    |  ___  || (\ \) |(_____  )   | |   
+   | |      | |   | | \   |   ) (     | (   ) || | \   |      ) |   | |   
+   | |   ___) (___| )  \  |   | |     | )   ( || )  \  |/\____) |___) (___
+   )_(   \_______/|/    )_)   \_/     |/     \||/    )_)\_______)\_______/
+                                                                          
+*/ 
+
+
 #ifndef TINY_ANSI_H
 #define TINY_ANSI_H
 
@@ -119,8 +131,8 @@ void tansi_eprintf(tansi_effects effect , const char* fmt , ...);
 void tansi_styleprint(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect);
 void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi_effects effect);
 void tansi_fatal(const char* tag, const char* msg, const char* file , int line);
-
-
+void tansi_render_file(const char* filepath);
+void tansi_render_style(const char* filepath, tansi_color fg, tansi_bg bg, tansi_effects effect);
 //#define TANSI_ASSERT(x, msg) \
 //    do { \
 //        if (!(x)) { tansi_fatal("ASSERT", msg, __FILE__, __LINE__); } \
@@ -151,6 +163,7 @@ void tansi_fatal(const char* tag, const char* msg, const char* file , int line);
 #include <stdarg.h>
 #include <time.h>
 #include <cstdlib>
+#include <cstring>
 
 
 
@@ -353,6 +366,75 @@ void tansi_fatal(const char* tag, const char* msg, const char* file , int line)
 
 }
 
+void tansi_render_file(const char* filepath)
+{
+
+    FILE* file;
+    char buffer[1024];
+
+    if(!filepath){
+      fprintf(stderr, "[tansi] Invalid file Path (NULL) \n");
+      return;
+    }
+    
+    file = fopen(filepath, "r");
+    if(!file){
+        fprintf(stderr, "[tansi] Failed to open File: %s\n", filepath);
+        return;
+    }
+    
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len-1] == '\r'){
+      buffer[len-1] = '\0';
+    }
+
+    while(fgets(buffer, sizeof(buffer), file)){
+      printf("%s", buffer);
+    }
+    
+    fclose(file);
+}
+
+void tansi_render_style(const char* filepath, tansi_color fg, tansi_bg bg, tansi_effects effect)
+{
+    
+  TANSI_ASSERT(filepath != NULL , "File Path cannot be left empty!" );
+
+   if (fg < 0 || fg >= TANSI_COLOR_COUNT)
+        fg = TANSI_RESET;
+    if (bg < 0 || bg >= TANSI_BG_COUNT)
+        bg = TANSI_BG_DEFAULT;
+    if (effect < 0 || effect >= TANSI_EFFECT_COUNT)
+        effect = TANSI_EFFECT_RESET;
+
+    FILE* file = fopen(filepath, "r");
+    if (!file) {
+        perror("[tansi] Failed to open ASCII file");
+        return;
+    }
+
+    char buffer[1024];
+    while(fgets(buffer, sizeof(buffer), file))
+{
+
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len-1] == '\r')
+    {
+      buffer[len-1] = '\0';
+    }
+      printf("%s%s%s%s%s", 
+        tansi_effect_map[effect],
+        tansi_map[fg],
+        tansi_bg_map[bg],
+        buffer,
+        tansi_effect_map[TANSI_EFFECT_RESET]
+
+      );
+
+}
+    fclose(file);
+    fflush(stdout);
+}
 
 #endif // TINY_ANSI_IMPLEMENTATION
 

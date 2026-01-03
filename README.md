@@ -1,3 +1,6 @@
+![Alt text](tansi.png)
+
+
 # Tiny_ANSI
 
 **A small, header-only C/C++ library for colorful, styled terminal output.**  
@@ -121,7 +124,8 @@ tansi_disable_bgcolor();
 | `tansi_styleprint` | Print with foreground, background, and effect |
 | `tansi_styleprintln` | Same as above but with newline |
 | `tansi_fatal` | Print fatal error, file & line, and exit program |
-
+| `tansi_render_file` | Prints ASCII art from text file |
+| `tansi_render_style` | Print ASCII art from text files with effects and color |
 ---
 
 ## Example Program
