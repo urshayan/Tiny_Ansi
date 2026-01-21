@@ -21,6 +21,10 @@ extern "C" {
 // PUBLIC API DECLARATIONS
 // ==========================
 
+  static int g_graphics_enabled = 0;
+
+  
+
   // mapping Foreground Colors 
 typedef enum {
 
@@ -111,7 +115,13 @@ static const char* tansi_effect_map[TANSI_EFFECT_COUNT] = {
 /////-------------------------------------------------------------------  
 
 #define RESET "\033[0m"
-
+// --------------------------------------------------------------------- 
+// structs -- for the graphics!@
+typedef struct {
+  int width;
+  int height;
+  tansi_color* buffer;
+}tansi_canvas;
 
 
 
@@ -133,6 +143,17 @@ void tansi_styleprintln(const char* msg , tansi_color color, tansi_bg bg , tansi
 void tansi_fatal(const char* tag, const char* msg, const char* file , int line);
 void tansi_render_file(const char* filepath);
 void tansi_render_style(const char* filepath, tansi_color fg, tansi_bg bg, tansi_effects effect);
+void tansi_move_cursor(int row, int col);
+void tansi_draw_pixel(tansi_canvas* c, int x, int y, tansi_color color);
+void tansi_graphics_begin(void);
+void tansi_graphics_end(void);
+void tansi_canvas_destroy(tansi_canvas* c);
+void tansi_canvas_clear(tansi_canvas* c , tansi_color color);
+void tansi_canvas_present(const tansi_canvas* c);  // actual renderer!
+void tansi_get_terminal_size(int* out_w, int* out_h);
+tansi_canvas* tansi_canvas_create(int width, int height);
+
+
 //#define TANSI_ASSERT(x, msg) \
 //    do { \
 //        if (!(x)) { tansi_fatal("ASSERT", msg, __FILE__, __LINE__); } \
@@ -164,6 +185,8 @@ void tansi_render_style(const char* filepath, tansi_color fg, tansi_bg bg, tansi
 #include <time.h>
 #include <cstdlib>
 #include <cstring>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 
 
@@ -435,6 +458,137 @@ void tansi_render_style(const char* filepath, tansi_color fg, tansi_bg bg, tansi
     fclose(file);
     fflush(stdout);
 }
+
+void tansi_move_cursor(int row, int col)
+{
+  printf("\033[%d;%dH", row, col);
+}
+ // immediate mode render!
+//void tansi_draw_pixel(int x, int y, tansi_color color)
+//{
+
+  //  if (!g_graphics_enabled) return;
+   // if (color < 0 || color >= TANSI_COLOR_COUNT)
+       // color = TANSI_RESET;
+
+    //tansi_move_cursor(y+1, x+1);
+    //printf("%s█%s", tansi_map[color], tansi_map[TANSI_RESET]);
+    //fflush(stdout);
+//}
+//retained mode render pixel! 
+
+void tansi_draw_pixel(tansi_canvas* c, int x, int y, tansi_color color)
+{
+  if(!c) return;
+
+  if (x < 0 || y < 0 || x >= c->width || y >= c->height) return;
+
+  c->buffer[y * c->width + x] = color;  // indexing formula == inedx = y * width + x 
+
+}
+
+
+void tansi_graphics_begin(void)
+{
+    g_graphics_enabled = 1;
+    printf("\033[2J");            // for clear screen
+    printf("\033[?25l");          // for hide cursor
+    fflush(stdout);
+}
+
+void tansi_graphics_end(void)
+{
+
+  g_graphics_enabled = 0;
+    printf("\033[?25h");          // show cursor
+    printf("\033[0m");            // reset colors
+    fflush(stdout);
+}
+
+tansi_canvas* tansi_canvas_create(int width , int height)
+{
+  int term_w , term_h ;// terminal width and height
+  tansi_get_terminal_size(&term_w,&term_h);
+
+  if (width > term_w ) width = term_w;
+  if (height > term_h -1) height = term_h -1; // avoiddd scrolllll 
+
+
+
+  if (width <= 0 || height <= 0) return NULL;
+
+
+
+  tansi_canvas* c =(tansi_canvas*) malloc(sizeof(tansi_canvas));
+  if(!c) return NULL;
+
+  c->width = width;
+  c->height = height;
+  c->buffer = (tansi_color*)malloc(sizeof(tansi_color)* width * height);
+
+  if(!c->buffer){
+    free(c);
+    return NULL;
+  }
+
+  memset(c->buffer,TANSI_RESET,sizeof(tansi_color) * width * height);
+  return c;
+
+}
+
+void tansi_canvas_destroy(tansi_canvas* c)
+{
+    if(!c) return;
+    free(c->buffer);
+    free(c);
+
+}
+
+void tansi_canvas_clear(tansi_canvas* c , tansi_color color)
+{
+  if (!c) return;
+    
+  for (int i = 0; i < c->width * c->height; i++){
+    c->buffer[i] = color;
+  }
+
+}
+
+void tansi_canvas_present(const tansi_canvas* c)
+{
+  
+  if (!c) return ;
+
+  printf("\033[H"); // move cursor to top-left
+  
+  for (int y = 0; y < c->height; y++){
+    for (int x = 0; x < c->width; x++){
+      tansi_color col = c->buffer[y * c->width + x];
+      printf("%s█", tansi_map[col]);
+    }
+    printf("\n");
+  }
+  printf("%s", tansi_map[TANSI_RESET]);
+  fflush(stdout);
+
+}
+
+void tansi_get_terminal_size(int* out_w, int* out_h)
+{
+      if (!out_w || !out_h) return;
+
+    struct winsize ws;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0) {
+        *out_w = ws.ws_col;
+        *out_h = ws.ws_row;
+    } else {
+        *out_w = 80;  // safe fallback
+        *out_h = 24;
+    }
+
+}
+
+
 
 #endif // TINY_ANSI_IMPLEMENTATION
 
