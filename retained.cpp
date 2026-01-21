@@ -8,15 +8,14 @@ int main()
 
   tansi_graphics_begin();
 
-  tansi_canvas* canvas = tansi_canvas_create(30,20);
+  tansi_canvas* canvas = tansi_canvas_create(50,50);
 
-  for (int i = 0; i < 20; i++){
+  for (int i = 0; i < 30; i++){
     tansi_canvas_clear(canvas, TANSI_RESET);
-    tansi_draw_pixel(canvas, i , 10, TANSI_GREEN);
-    tansi_canvas_present(canvas);
-
+    tansi_draw_pixel(canvas, 10 , i , TANSI_RED);
   }
 
+  tansi_canvas_present(canvas);
   tansi_canvas_destroy(canvas);
 
   tansi_graphics_end();

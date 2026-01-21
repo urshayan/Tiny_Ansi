@@ -556,22 +556,25 @@ void tansi_canvas_clear(tansi_canvas* c , tansi_color color)
 
 void tansi_canvas_present(const tansi_canvas* c)
 {
-  
-  if (!c) return ;
+    if (!c) return;
+    // clear + home
+    printf("\033[H\033[2J");
 
-  printf("\033[H"); // move cursor to top-left
-  
-  for (int y = 0; y < c->height; y++){
-    for (int x = 0; x < c->width; x++){
-      tansi_color col = c->buffer[y * c->width + x];
-      printf("%s█", tansi_map[col]);
+    for (int y = 0; y < c->height; y++) {
+        for (int x = 0; x < c->width; x++) {
+            tansi_color col = c->buffer[y * c->width + x];
+            fputs(tansi_map[col], stdout);
+            fputs("█", stdout);
+
+              
+        }
+        fputc('\n', stdout);
     }
-    printf("\n");
-  }
-  printf("%s", tansi_map[TANSI_RESET]);
-  fflush(stdout);
 
+    fputs(tansi_map[TANSI_RESET], stdout);
+    fflush(stdout);
 }
+
 
 void tansi_get_terminal_size(int* out_w, int* out_h)
 {
