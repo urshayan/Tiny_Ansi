@@ -21,7 +21,7 @@ extern "C" {
 // PUBLIC API DECLARATIONS
 // ==========================
 
-  static int g_graphics_enabled = 0;
+  static int g_graphics_enabled = 0; // for immediate mode rendering // not implemented now!
 
   
 
@@ -124,7 +124,6 @@ typedef struct {
 }tansi_canvas;
 
 
-
 //// funtionsssssssssssssssssssssssssssss
 void tansi_print(const char* msg , tansi_color color);
 void tansi_println(const char* msg , tansi_color color);
@@ -151,6 +150,7 @@ void tansi_canvas_destroy(tansi_canvas* c);
 void tansi_canvas_clear(tansi_canvas* c , tansi_color color);
 void tansi_canvas_present(const tansi_canvas* c);  // actual renderer!
 void tansi_get_terminal_size(int* out_w, int* out_h);
+void tansi_draw_line(tansi_canvas* c, int x0 , int y0, int y1, int y2, tansi_color color);
 tansi_canvas* tansi_canvas_create(int width, int height);
 
 
@@ -187,6 +187,7 @@ tansi_canvas* tansi_canvas_create(int width, int height);
 #include <cstring>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <math.h>
 
 
 
@@ -479,23 +480,27 @@ void tansi_move_cursor(int row, int col)
 
 void tansi_draw_pixel(tansi_canvas* c, int x, int y, tansi_color color)
 {
-  if(!c) return;
+    if (!c) return;
 
-  if (x < 0 || y < 0 || x >= c->width || y >= c->height) return;
+    // Clamp X and Y
+    if (x < 0) x = 0;
+    if (x >= c->width) x = c->width - 1;
+    if (y < 0) y = 0;
+    if (y >= c->height) y = c->height - 1;
 
-  c->buffer[y * c->width + x] = color;  // indexing formula == inedx = y * width + x 
-
+    c->buffer[y * c->width + x] = color;
 }
 
 
+// for immediate mode graphics 
 void tansi_graphics_begin(void)
 {
     g_graphics_enabled = 1;
-    printf("\033[2J");            // for clear screen
+    printf("\033[2J");            // for clear scree
     printf("\033[?25l");          // for hide cursor
     fflush(stdout);
 }
-
+// for immediate mode graphics!
 void tansi_graphics_end(void)
 {
 
@@ -553,27 +558,27 @@ void tansi_canvas_clear(tansi_canvas* c , tansi_color color)
   }
 
 }
-
+// fixed y hopping
 void tansi_canvas_present(const tansi_canvas* c)
 {
     if (!c) return;
-    // clear + home
-    printf("\033[H\033[2J");
+
+    printf("\033[2J");   // Clear screen
+    fflush(stdout);
 
     for (int y = 0; y < c->height; y++) {
         for (int x = 0; x < c->width; x++) {
             tansi_color col = c->buffer[y * c->width + x];
-            fputs(tansi_map[col], stdout);
-            fputs("█", stdout);
-
-              
+            printf("\033[%d;%dH%s█", y + 1, x + 1, tansi_map[col]);
         }
-        fputc('\n', stdout);
     }
 
-    fputs(tansi_map[TANSI_RESET], stdout);
+    // Reset color at the end
+    printf("%s", tansi_map[TANSI_RESET]);
     fflush(stdout);
 }
+
+
 
 
 void tansi_get_terminal_size(int* out_w, int* out_h)
@@ -590,7 +595,35 @@ void tansi_get_terminal_size(int* out_w, int* out_h)
     }
 
 }
+void tansi_draw_line(tansi_canvas* c , int x0 , int y0, int x1, int y1, tansi_color color)
+{
 
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
+    int sx = x0 < x1 ? 1 : -1;
+    int sy = y0 < y1 ? 1 : -1;
+    int err = (dx > dy ? dx : -dy) / 2;
+    int e2;
+
+    while (true){
+        
+      tansi_draw_pixel(c,x0,y0,color);
+      if (x0 == x1 && y0 == y1 )break;
+      e2 = err;
+      if (e2  > -dx ){err -= dy; x0+= sx ; }
+      if (e2 < dy ) { err += dx ; y0+= sy; }
+
+    }// end while loop
+
+
+
+
+}
+
+
+
+// TODO: 
+// Add basics line and shapes 
 
 
 #endif // TINY_ANSI_IMPLEMENTATION

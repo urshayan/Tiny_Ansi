@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define TINY_ANSI_IMPLEMENTATION
-#include "tinyansi.h"  // your library
+#include "../tinyansi.h"  // your library
 
 int main() {
     tansi_init(); // initialize ANSI colors
-
+    
     // Create a canvas
     tansi_canvas* c = tansi_canvas_create(20, 10); // 20x10 canvas
 
@@ -21,8 +21,10 @@ int main() {
 
     // Present the canvas
     tansi_canvas_present(c);
-
+    
     // Pause to see the result
+    
+    tansi_print("This was Made By TINY ANSI -- no external Libs!" , TANSI_MAGENTA);
     printf("\nPress Enter to exit...");
     getchar();
 
