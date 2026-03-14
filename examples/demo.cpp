@@ -1,5 +1,5 @@
 #define TINY_ANSI_IMPLEMENTATION
-#include "tinyansi.h"
+#include "../tinyansi.h"
 
 int main() {
     tansi_init();

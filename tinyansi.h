@@ -151,6 +151,9 @@ void tansi_canvas_clear(tansi_canvas* c , tansi_color color);
 void tansi_canvas_present(const tansi_canvas* c);  // actual renderer!
 void tansi_get_terminal_size(int* out_w, int* out_h);
 void tansi_draw_line(tansi_canvas* c, int x0 , int y0, int y1, int y2, tansi_color color);
+void tansi_draw_circle_points(tansi_canvas* c, int xc, int yc, int x, int y, tansi_color color);
+void tansi_draw_circle(tansi_canvas * c, int xc , int yc , int r , tansi_color color);
+
 tansi_canvas* tansi_canvas_create(int width, int height);
 
 
@@ -615,10 +618,45 @@ void tansi_draw_line(tansi_canvas* c , int x0 , int y0, int x1, int y1, tansi_co
 
     }// end while loop
 
+}
 
 
+
+void tansi_draw_circle_points(tansi_canvas* c, int xc, int yc, int x, int y, tansi_color color)
+{
+    tansi_draw_pixel(c,xc + x, yc + y, color);
+    tansi_draw_pixel(c,xc - x, yc + y, color);
+    tansi_draw_pixel(c,xc + x, yc - y, color);
+    tansi_draw_pixel(c,xc - x, yc - y, color);
+    tansi_draw_pixel(c,xc + y, yc + x, color);
+    tansi_draw_pixel(c,xc - y, yc + x, color);
+    tansi_draw_pixel(c,xc + y, yc - x, color);
+    tansi_draw_pixel(c,xc - y, yc - x, color); 
 
 }
+
+void tansi_draw_circle(tansi_canvas* c , int xc, int yc, int r, tansi_color color)
+{
+
+  
+    int x = 0, y = r;
+    int p = 1 -r;
+
+    tansi_draw_circle_points(c,xc,yc,x,y,color);
+
+    while(x < y){
+      x++;
+      if (p < 0) {
+        p = p + 2 * x + 1;
+      }else{
+          y--;
+          p = p + 2 * (x - y) + 1;
+      }
+      tansi_draw_circle_points(c,xc,yc,x,y,color);
+    }
+
+}
+
 
 
 

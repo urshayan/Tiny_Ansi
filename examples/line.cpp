@@ -15,7 +15,7 @@ int main()
     
   if (c){
 
-         tansi_draw_line(c,3,3,10,20,TANSI_RED);
+         tansi_draw_line(c,6,6,14,16,TANSI_RED);
       }
 
 
